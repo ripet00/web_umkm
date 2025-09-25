@@ -1,47 +1,32 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
-        
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    <div class="w-full max-w-4xl mx-auto px-6 py-4">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">Masuk Sebagai</h1>
+            <p class="text-gray-600 dark:text-gray-400">Pilih peran Anda untuk melanjutkan</p>
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+        <div class="flex flex-col md:flex-row justify-center items-center gap-8">
+            <!-- User Card -->
+            <a href="{{ route('user.login') }}" class="w-full md:w-64">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg p-8 text-center transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                    <!-- Heroicon: user -->
+                    <svg class="w-16 h-16 mx-auto text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                    </svg>
+                    <h2 class="mt-4 text-xl font-semibold text-gray-700 dark:text-gray-200">User</h2>
+                </div>
+            </a>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            <!-- Koperasi/Seller Card -->
+            <a href="{{ route('seller.login') }}" class="w-full md:w-64">
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg p-8 text-center transform transition-transform duration-300 hover:scale-105 hover:shadow-xl">
+                    <!-- Heroicon: building-storefront -->
+                    <svg class="w-16 h-16 mx-auto text-teal-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5A.75.75 0 0 1 14.25 12h.01M6.375 21v-7.5a.75.75 0 0 0-.75-.75h-.01M12 3v.01M3 3v.01M3 21v.01M21 3v.01M21 21v.01M12 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm-3 18.75a.75.75 0 0 0 .75.75h.01a.75.75 0 0 0 .75-.75v-.01a.75.75 0 0 0-.75-.75h-.01a.75.75 0 0 0-.75.75v.01ZM12 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                    </svg>
+                    <h2 class="mt-4 text-xl font-semibold text-gray-700 dark:text-gray-200">Koperasi</h2>
+                </div>
+            </a>
         </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
+    </div>
 </x-guest-layout>
