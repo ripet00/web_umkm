@@ -10,9 +10,13 @@ return new class extends Migration {
         Schema::create('sellers', function (Blueprint $table) {
             $table->id();
             $table->string('nama_koperasi');
+            $table->string('email')->unique();
+            $table->string('email_verified_at')->nullable();
+            $table->string('password');
             $table->string('kecamatan');
             $table->string('desa_kelurahan');
             $table->string('jenis_usaha');
+            $table->rememberToken();
             $table->timestamps();
         });
     }
