@@ -1,9 +1,10 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\HomeController; // Tambahkan ini
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
-use App\Http\Controllers\Auth\SellerLoginController;
+use App\Http\Controllers\SellerLoginController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 
@@ -12,6 +13,12 @@ Route::get('/', [PageController::class, 'welcome'])->name('welcome'); // Halaman
 Route::get('/home', [HomeController::class, 'index'])->name('home'); // Halaman utama (daftar produk)
 
 // Route::get('/products/{product}', [HomeController::class, 'show'])->name('products.show.public'); // Untuk detail produk
+
+// --- Rute Halaman Login ---
+// Halaman pemilihan peran (User atau Seller)
+Route::get('login', function() { return view('auth.login'); })->middleware('guest')->name('login');
+// Halaman form login untuk User
+Route::get('user/login', function() { return view('auth.user-login'); })->middleware('guest:web')->name('user.login');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
