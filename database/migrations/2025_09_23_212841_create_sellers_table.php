@@ -11,11 +11,15 @@ return new class extends Migration {
             $table->id();
             $table->string('nama_koperasi');
             $table->string('email')->unique();
-            $table->string('email_verified_at')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('kecamatan');
             $table->string('desa_kelurahan');
             $table->string('jenis_usaha');
+            $table->string('no_hp')->nullable();
+            $table->text('alamat_toko')->nullable();
+            $table->text('deskripsi_toko')->nullable();
+            $table->string('foto_profil')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
