@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable; // Ganti Model dengan Authenticatable
 use Illuminate\Notifications\Notifiable; // Tambahkan Notifiable
@@ -14,9 +13,11 @@ class Seller extends Authenticatable
 
     protected $fillable = [
         'nama_koperasi',
+        'email',
+        'password',
         'kecamatan',
         'desa_kelurahan',
-        'jenis_usaha',
+        'jenis_usaha'
     ];
 
     /**
@@ -28,6 +29,14 @@ class Seller extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
 
     public function products(): HasMany
     {
