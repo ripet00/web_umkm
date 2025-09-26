@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable; // Ganti Model dengan Authenticatable
-use Illuminate\Notifications\Notifiable; // Tambahkan Notifiable
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 class Seller extends Authenticatable
 {
@@ -17,7 +17,11 @@ class Seller extends Authenticatable
         'password',
         'kecamatan',
         'desa_kelurahan',
-        'jenis_usaha'
+        'jenis_usaha',
+        'no_hp',
+        'alamat_toko',
+        'deskripsi_toko',
+        'foto_profil',
     ];
 
     /**
