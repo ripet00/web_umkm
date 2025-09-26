@@ -1,10 +1,10 @@
 <x-guest-layout>
+    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight text-center mb-4">
+        Login Penjual
+    </h2>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <div class="text-center mb-6">
-        <h2 class="text-2xl font-bold text-gray-700 dark:text-gray-200">Login Koperasi / Seller</h2>
-    </div>
 
     <form method="POST" action="{{ route('seller.login') }}">
         @csrf
@@ -37,9 +37,22 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
+            {{-- Jika Anda ingin menambahkan fitur "lupa password" untuk seller --}}
+            {{-- @if (Route::has('seller.password.request'))
+                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('seller.password.request') }}">
+                    {{ __('Forgot your password?') }}
+                </a>
+            @endif --}}
+
+            <x-primary-button class="ms-3">
                 {{ __('Log in') }}
             </x-primary-button>
+        </div>
+
+        <div class="flex items-center justify-center mt-4">
+             <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100" href="{{ route('seller.register') }}">
+                Belum punya akun? Daftar sebagai Penjual
+            </a>
         </div>
     </form>
 </x-guest-layout>
