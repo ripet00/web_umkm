@@ -16,10 +16,10 @@
         </div>
 
         <script>
-            // Redirect ke halaman utama setelah 5 detik
+            // Redirect ke halaman utama setelah 3 detik
             setTimeout(function() {
                 window.location.href = "{{ route('home') }}";
-            }, 5000); // 5000 milidetik = 5 detik
+            }, 3000); // 3000 milidetik = 3 detik
         </script>
     </body>
 </html>
