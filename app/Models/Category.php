@@ -9,7 +9,14 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nama_kategori', 'slug'];
+    // Ubah sesuai kolom database
+    protected $fillable = ['name', 'slug'];
+
+    // Tambahkan accessor untuk backward compatibility
+    public function getNamaKategoriAttribute()
+    {
+        return $this->name;
+    }
 
     public function products()
     {

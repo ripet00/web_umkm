@@ -26,6 +26,7 @@ class ProductController extends Controller
     {
         // <-- 2. Ambil semua data kategori
         $categories = Category::all(); 
+        
         // <-- 3. Kirim data kategori ke view
         return view('sellers.products.create', compact('categories'));
     }
