@@ -78,7 +78,7 @@
                         </div>
                         <div class="mt-6 text-right">
                             <p class="text-lg font-semibold">Total: Rp {{ number_format($total, 0, ',', '.') }}</p>
-                            <a href="#" class="mt-4 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+                            <a href="{{ route('orders.checkout') }}" class="mt-4 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
                                 Lanjutkan ke Pembayaran
                             </a>
                         </div>
