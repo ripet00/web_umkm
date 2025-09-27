@@ -35,17 +35,6 @@
                                 <x-input-error class="mt-2" :messages="$errors->get('category_id')" />
                             </div>
 
-                            <style>
-                                #category_id {
-                                    color-scheme: dark !important;
-                                }
-
-                                #category_id option {
-                                    background-color: #1f2937 !important;
-                                    color: #e5e7eb !important;
-                                }
-                            </style>
-
                             <!-- Deskripsi -->
                             <div>
                                 <x-input-label for="deskripsi" value="Deskripsi" />
