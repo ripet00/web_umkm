@@ -5,16 +5,19 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Midtrans\Config;
 use Midtrans\Snap;
+use Illuminate\Support\Facades\DB;
+
 
 class OrderController extends Controller
 {
     public function __construct() {
         // Set konfigurasi Midtrans
+        // Pastikan Anda sudah mengatur variabel-variabel ini di config/midtrans.php
         Config::$serverKey = config('midtrans.server_key');
         Config::$clientKey = config('midtrans.client_key');
         Config::$isProduction = config('midtrans.is_production');
@@ -27,131 +30,173 @@ class OrderController extends Controller
         $cart = Cart::with('items.product')->where('user_id', Auth::id())->firstOrFail();
 
         if ($cart->items->isEmpty()) {
-            return redirect()->route('cart.index')->with('error', 'Keranjang belanja Anda kosong.');
+            return redirect()->route('home')->with('error', 'Keranjang Anda kosong!');
         }
+
         return view('orders.checkout', compact('cart'));
     }
 
     # Memproses pesanan dan membuat transaksi Midtrans
-    public function process(Request $request) {
+    public function process(Request $request)
+    {
         $user = Auth::user();
-        $cart = $user->cart;
+        $cart = Cart::with('items.product.seller')->where('user_id', $user->id)->firstOrFail();
 
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('home')->with('error', 'Keranjang belanja Anda kosong.');
+        if ($cart->items->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'Tidak ada item di keranjang untuk di-checkout.');
         }
+        
+        // Kelompokkan item berdasarkan seller_id
+        $itemsBySeller = $cart->items->groupBy('product.seller_id');
 
-        // Gunakan transaksi database untuk memastikan konsistensi data
-        DB::beginTransaction(); 
+        // Gunakan DB Transaction untuk memastikan integritas data
+        $orders = DB::transaction(function () use ($user, $itemsBySeller) {
+            $createdOrders = [];
+            foreach ($itemsBySeller as $sellerId => $items) {
+                // Hitung total harga per penjual
+                $totalPerSeller = $items->sum(function ($item) {
+                    return $item->quantity * $item->product->harga;
+                });
 
-        try {
-            // 1 Buat pesanan baru
-            $order = Order::create([
-                'user_id' => $user->id,
-                'total_harga' => 0, // Akan diupdate nanti
-                'status' => 'pending',
-            ]);
-
-            $totalPrice = 0;
-
-            // 2 Pindahkan item dari keranjang ke item pesanan
-            foreach ($cart->items as $item) {
-                // Cek stok lagi untuk keamanan
-                if ($item->product->stok < $item->quantity) {
-                    throw new \Exception('Stok untuk produk' . $item->product->nama_produk . ' tidak mencukupi.');
-                }
-
-                $order->items()->create([
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'harga' => $item->product->harga,
+                // Buat pesanan baru untuk setiap penjual
+                $order = Order::create([
+                    'user_id' => $user->id,
+                    'seller_id' => $sellerId, // Menggunakan seller_id yang benar
+                    'nomor_pesanan' => 'ORD-' . Str::uuid(),
+                    'total_harga' => $totalPerSeller,
+                    'status' => 'unpaid',
                 ]);
 
-                $totalPrice += $item->product->harga * $item->quantity;
+                // Pindahkan item dari keranjang ke item pesanan
+                foreach ($items as $item) {
+                    // Cek stok sebelum membuat pesanan
+                    if ($item->product->stok < $item->quantity) {
+                        // Jika stok tidak cukup, batalkan transaksi
+                        throw new \Exception('Stok untuk produk ' . $item->product->nama_produk . ' tidak mencukupi.');
+                    }
+
+                    $order->items()->create([
+                        'product_id' => $item->product_id,
+                        'quantity' => $item->quantity,
+                        'harga' => $item->product->harga,
+                    ]);
+                }
+                $createdOrders[] = $order;
             }
 
-            // 3 Update total harga pesanan
-            $order->update(['total_harga' => $totalPrice]);
+            return $createdOrders;
+        });
 
-            // 4 Siapkan detail untuk Midtrans
-            $transaction_details = [
-                'order_id' => $order->id . '-' . time(), // ID unik
-                'gross_amount' => $totalPrice,
-            ];
+        // Karena sekarang bisa ada beberapa pesanan, kita akan redirect ke halaman riwayat pesanan
+        // Di aplikasi nyata, Anda mungkin ingin membuat satu sesi pembayaran untuk semua pesanan,
+        // tapi untuk saat ini, kita akan buat terpisah agar lebih sederhana.
+        // Untuk contoh ini, kita ambil pesanan pertama untuk proses pembayaran.
+        $mainOrder = $orders[0];
 
-            $customer_details = [
-                'first_name' => $user->name,
+        // Buat transaksi ke Midtrans untuk pesanan utama
+        $midtrans_params = [
+            'transaction_details' => [
+                'order_id' => $mainOrder->nomor_pesanan,
+                'gross_amount' => $mainOrder->total_harga,
+            ],
+            'customer_details' => [
+                'first_name' => $user->nama,
                 'email' => $user->email,
                 'phone' => $user->no_hp,
-            ];
+            ],
+        ];
 
-            $params = [
-                'transaction_details' => $transaction_details,
-                'customer_details' => $customer_details,
-            ];
+        try {
+            $snapToken = Snap::getSnapToken($midtrans_params);
+            $mainOrder->snap_token = $snapToken;
+            $mainOrder->save();
 
-            // 5. Dapatkan Snap Token dari Midtrans
-            $snapToken = Snap::getSnapToken($params);
-            
-            // Simpan snap token ke pesanan untuk referensi
-            $order->update(['snap_token' => $snapToken]);
+            // Kosongkan keranjang setelah pesanan berhasil dibuat
+            $cart->items()->delete();
 
-            // Jika semua berhasil, commit transaksi database
-            DB::commit();
+            return view('orders.payment', compact('snapToken', 'mainOrder'));
 
-            return view('orders.payment', compact('snapToken', 'order'));
         } catch (\Exception $e) {
-            // Jika ada error, rollback transaksi database
-            DB::rollBack();
-            return redirect()->route('cart.index')->with('error', 'Terjadi kesalahan saat memproses pesanan: ' . $e->getMessage());
+            return redirect()->route('checkout')->with('error', 'Gagal membuat sesi pembayaran: ' . $e->getMessage());
         }
     }
 
-    # Menangani callback dari Midtrans
-    public function callback(Request $request)
+
+    # Callback dari Midtrans
+    public function handleMidtransNotification(Request $request)
     {
+        $notification_payload = $request->all();
+        $orderId = $notification_payload['order_id'];
+        $statusCode = $notification_payload['status_code'];
+        $grossAmount = $notification_payload['gross_amount'];
+        $signatureKey = $notification_payload['signature_key'];
         $serverKey = config('midtrans.server_key');
-        $hashed = hash("sha512", $request->order_id . $request->status_code . $request->gross_amount . $serverKey);
 
-        if ($hashed == $request->signature_key) {
-            if ($request->transaction_status == 'capture' || $request->transaction_status == 'settlement') {
-                $orderId = explode('-', $request->order_id)[0];
-                $order = Order::find($orderId);
+        // Verifikasi signature
+        $signature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
 
-                if ($order && $order->status == 'pending') {
-                    // Update status pesanan
-                    $order->update(['status' => 'paid']);
-
-                    // Kurangi stok produk
-                    foreach ($order->items as $item) {
-                        $product = Product::find($item->product_id);
-                        $product->decrement('stok', $item->quantity);
-                    }
-
-                    // Kosongkan keranjang pengguna
-                    $user = $order->user;
-                    if ($user->cart) {
-                        $user->cart->items()->delete();
-                    }
-                }
-            }
+        if ($signature !== $signatureKey) {
+            return response()->json(['message' => 'Invalid signature'], 403);
         }
+
+        $order = Order::where('nomor_pesanan', $orderId)->first();
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Update status pesanan berdasarkan notifikasi
+        $transactionStatus = $notification_payload['transaction_status'];
+        $fraudStatus = $notification_payload['fraud_status'];
+
+        if ($transactionStatus == 'capture') {
+            if ($fraudStatus == 'accept') {
+                // Pembayaran berhasil
+                $this->processSuccessfulPayment($order);
+            }
+        } else if ($transactionStatus == 'settlement') {
+            // Pembayaran berhasil
+            $this->processSuccessfulPayment($order);
+        } else if ($transactionStatus == 'cancel' || $transactionStatus == 'deny' || $transactionStatus == 'expire') {
+            // Pembayaran gagal
+            $order->update(['status' => 'failed']);
+        }
+
+        return response()->json(['message' => 'Notification processed']);
     }
 
-    # Menampilkan riwayat pesanan pengguna
+    protected function processSuccessfulPayment(Order $order)
+    {
+        // Gunakan transaction untuk memastikan semua proses berhasil
+        DB::transaction(function () use ($order) {
+            if ($order->status == 'unpaid') {
+                $order->update(['status' => 'paid']);
+
+                // Kurangi stok produk
+                foreach ($order->items as $item) {
+                    $product = Product::find($item->product_id);
+                    $product->decrement('stok', $item->quantity);
+                }
+
+                // Tidak perlu lagi mengosongkan keranjang di sini karena sudah dilakukan setelah checkout
+            }
+        });
+    }
+
     public function index()
     {
-        $orders = Order::where('user_id', Auth::id())->latest()->paginate(10);
+        $orders = Order::where('user_id', Auth::id())->with('items.product')->latest()->get();
         return view('orders.index', compact('orders'));
     }
 
-    # Menampilkan detail pesanan
     public function show(Order $order)
     {
-        // Otorisasi: pastikan pesanan ini milik user yang sedang login
+        // Pastikan user hanya bisa melihat order miliknya
         if ($order->user_id !== Auth::id()) {
             abort(403);
         }
+        $order->load('items.product.seller');
         return view('orders.show', compact('order'));
     }
 }
+
