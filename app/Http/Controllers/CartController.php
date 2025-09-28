@@ -32,29 +32,31 @@ class CartController extends Controller
         $product = Product::findOrFail($request->product_id);
         $user = Auth::user();
 
-        // Cek jika stok mencukupi
-        if ($product->stok < $request->quantity) {
-            return back()->with('error', 'Stok produk tidak mencukupi.');
-        }
-
-        // Dapatkan atau buat keranjang untuk user
+        // Cari atau buat keranjang untuk user
         $cart = $user->cart()->firstOrCreate([]);
 
         // Cek apakah item sudah ada di keranjang
         $cartItem = $cart->items()->where('product_id', $product->id)->first();
 
         if ($cartItem) {
-            // Jika sudah ada, update quantity
+            // Jika sudah ada, tambahkan quantity-nya
+            $newQuantity = $cartItem->quantity + $request->quantity;
+            if ($product->stok < $newQuantity) {
+                return back()->with('error', 'Stok tidak mencukupi!');
+            }
             $cartItem->increment('quantity', $request->quantity);
         } else {
             // Jika belum ada, buat item baru
+            if ($product->stok < $request->quantity) {
+                return back()->with('error', 'Stok tidak mencukupi!');
+            }
             $cart->items()->create([
                 'product_id' => $product->id,
                 'quantity' => $request->quantity,
             ]);
         }
 
-        return redirect()->route('cart.index')->with('success', 'Produk berhasil ditambahkan ke keranjang.');
+        return redirect()->route('cart.index')->with('success', 'Produk berhasil ditambahkan ke keranjang!');
     }
 
     /**
@@ -62,22 +64,18 @@ class CartController extends Controller
      */
     public function update(Request $request, CartItem $item)
     {
-        // Otorisasi: pastikan item ini milik user yang sedang login
+        // Pastikan item ini milik user yang sedang login
         if ($item->cart->user_id !== Auth::id()) {
             abort(403);
         }
 
-        $request->validate([
-            'quantity' => 'required|integer|min:1',
-        ]);
+        $request->validate(['quantity' => 'required|integer|min:1']);
         
-        // Cek stok
-        if($item->product->stok < $request->quantity) {
-            return back()->with('error', 'Stok produk tidak mencukupi.');
+        if ($item->product->stok < $request->quantity) {
+            return back()->with('error', 'Stok tidak mencukupi!');
         }
 
         $item->update(['quantity' => $request->quantity]);
-
         return back()->with('success', 'Jumlah produk berhasil diperbarui.');
     }
 
@@ -86,13 +84,13 @@ class CartController extends Controller
      */
     public function destroy(CartItem $item)
     {
-        // Otorisasi
+        // Pastikan item ini milik user yang sedang login
         if ($item->cart->user_id !== Auth::id()) {
             abort(403);
         }
 
         $item->delete();
-
         return back()->with('success', 'Produk berhasil dihapus dari keranjang.');
     }
 }
+
