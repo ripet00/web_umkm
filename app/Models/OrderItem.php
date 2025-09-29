@@ -10,11 +10,12 @@ class OrderItem extends Model
 {
     use HasFactory;
 
+    // Pastikan semua kolom ini sesuai dengan tabel Anda
     protected $fillable = [
         'order_id',
         'product_id',
         'quantity',
-        'price',
+        'price'
     ];
 
     public function order(): BelongsTo
@@ -27,3 +28,4 @@ class OrderItem extends Model
         return $this->belongsTo(Product::class);
     }
 }
+
