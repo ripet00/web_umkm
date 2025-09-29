@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\OrderItem; 
+use App\Models\OrderItem; // DITAMBAHKAN
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -70,7 +70,7 @@ class OrderController extends Controller
                     $order->items()->create([
                         'product_id' => $item->product_id,
                         'quantity' => $item->quantity,
-                        'price' => $item->product->harga, // DIUBAH DARI 'harga'
+                        'price' => $item->product->harga, // DIPERBAIKI: dari 'harga' menjadi 'price'
                     ]);
                 }
                 $createdOrders[] = $order;
@@ -103,7 +103,8 @@ class OrderController extends Controller
             return view('orders.payment', compact('snapToken', 'mainOrder'));
 
         } catch (\Exception $e) {
-            return redirect()->route('checkout')->with('error', 'Gagal membuat sesi pembayaran: ' . $e->getMessage());
+            // DIPERBAIKI: Mengarahkan ke rute yang benar
+            return redirect()->route('orders.checkout')->with('error', 'Gagal membuat sesi pembayaran: ' . $e->getMessage());
         }
     }
 
