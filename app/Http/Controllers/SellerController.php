@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Seller;
 
 class SellerController extends Controller
 {
@@ -32,11 +33,14 @@ class SellerController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Menampilkan halaman publik seller.
      */
-    public function show(string $id)
+    public function show(Seller $seller)
     {
-        //
+        // Ambil produk milik seller ini dan paginasi
+        $products = $seller->products()->latest()->paginate(12);
+
+        return view('sellers.show', compact('seller', 'products'));
     }
 
     /**

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
-use App\Models\OrderItem; // DITAMBAHKAN
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -45,66 +45,66 @@ class OrderController extends Controller
         
         $itemsBySeller = $cart->items->groupBy('product.seller_id');
 
-        $orders = DB::transaction(function () use ($user, $itemsBySeller) {
-            $createdOrders = [];
-            foreach ($itemsBySeller as $sellerId => $items) {
-                $totalPerSeller = $items->sum(function ($item) {
-                    return $item->quantity * $item->product->harga;
-                });
-
-                $order = Order::create([
-                    'user_id' => $user->id,
-                    'seller_id' => $sellerId,
-                    'order_number' => 'ORD-' . Str::uuid(),
-                    'total_price' => $totalPerSeller,
-                    'status' => 'pending',
-                    'payment_status' => 'unpaid',
-                    'payment_gateway' => 'midtrans',
-                ]);
-
-                foreach ($items as $item) {
-                    if ($item->product->stok < $item->quantity) {
-                        throw new \Exception('Stok untuk produk ' . $item->product->nama_produk . ' tidak mencukupi.');
-                    }
-
-                    $order->items()->create([
-                        'product_id' => $item->product_id,
-                        'quantity' => $item->quantity,
-                        'price' => $item->product->harga, // DIPERBAIKI: dari 'harga' menjadi 'price'
-                    ]);
-                }
-                $createdOrders[] = $order;
-            }
-
-            return $createdOrders;
-        });
-        
-        $mainOrder = $orders[0];
-
-        $midtrans_params = [
-            'transaction_details' => [
-                'order_id' => $mainOrder->order_number,
-                'gross_amount' => (int) $mainOrder->total_price,
-            ],
-            'customer_details' => [
-                'first_name' => $user->nama,
-                'email' => $user->email,
-                'phone' => $user->no_hp,
-            ],
-        ];
-
         try {
+            $orders = DB::transaction(function () use ($user, $itemsBySeller) {
+                $createdOrders = [];
+                foreach ($itemsBySeller as $sellerId => $items) {
+                    $totalPerSeller = $items->sum(function ($item) {
+                        return $item->quantity * $item->product->harga;
+                    });
+
+                    $order = Order::create([
+                        'user_id' => $user->id,
+                        'seller_id' => $sellerId,
+                        'order_number' => 'ORD-' . Str::uuid(),
+                        'total_price' => $totalPerSeller,
+                        'status' => 'pending',
+                        'payment_status' => 'unpaid',
+                        'payment_gateway' => 'midtrans',
+                    ]);
+
+                    foreach ($items as $item) {
+                        if ($item->product->stok < $item->quantity) {
+                            throw new \Exception('Stok untuk produk ' . $item->product->nama_produk . ' tidak mencukupi.');
+                        }
+
+                        $order->items()->create([
+                            'product_id' => $item->product_id,
+                            'quantity' => $item->quantity,
+                            'price' => $item->product->harga,
+                        ]);
+                    }
+                    $createdOrders[] = $order;
+                }
+
+                return $createdOrders;
+            });
+            
+            $mainOrder = $orders[0];
+
+            $midtrans_params = [
+                'transaction_details' => [
+                    'order_id' => $mainOrder->order_number,
+                    'gross_amount' => (int) $mainOrder->total_price,
+                ],
+                'customer_details' => [
+                    'first_name' => $user->nama,
+                    'email' => $user->email,
+                    'phone' => $user->no_hp,
+                ],
+            ];
+
             $snapToken = Snap::getSnapToken($midtrans_params);
             $mainOrder->snap_token = $snapToken;
             $mainOrder->save();
 
-            $cart->items()->delete();
+            // Pindahkan ini ke setelah pembayaran berhasil via webhook
+            // $cart->items()->delete(); 
 
-            return view('orders.payment', compact('snapToken', 'mainOrder'));
+            return view('orders.payment', ['snapToken' => $snapToken, 'order' => $mainOrder]); // DIPERBAIKI
 
         } catch (\Exception $e) {
-            // DIPERBAIKI: Mengarahkan ke rute yang benar
-            return redirect()->route('orders.checkout')->with('error', 'Gagal membuat sesi pembayaran: ' . $e->getMessage());
+            return redirect()->route('orders.checkout')->with('error', 'Gagal memproses pesanan: ' . $e->getMessage());
         }
     }
 
@@ -152,6 +152,14 @@ class OrderController extends Controller
                 foreach ($order->items as $item) {
                     $product = Product::find($item->product_id);
                     DB::table('products')->where('id', $product->id)->lockForUpdate()->decrement('stok', $item->quantity);
+                }
+                 // Hapus item keranjang setelah pembayaran berhasil
+                $cart = Cart::where('user_id', $order->user_id)->first();
+                if ($cart) {
+                    // Ambil semua product_id dari pesanan ini
+                    $orderedProductIds = $order->items()->pluck('product_id');
+                    // Hapus item dari keranjang yang sesuai dengan produk yang dipesan
+                    $cart->items()->whereIn('product_id', $orderedProductIds)->delete();
                 }
             }
         });

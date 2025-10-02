@@ -18,8 +18,8 @@ class Order extends Model
         'order_number',
         'total_price',
         'status',
-        'payment_status',    // DITAMBAHKAN
-        'payment_gateway',   // DITAMBAHKAN
+        'payment_status',    
+        'payment_gateway',  
         'snap_token',
     ];
 
