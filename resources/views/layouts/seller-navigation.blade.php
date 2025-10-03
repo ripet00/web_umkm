@@ -15,8 +15,12 @@
                     <x-nav-link :href="route('seller.dashboard')" :active="request()->routeIs('seller.dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('seller.products.index')" :active="request()->routeIs('seller.products.*')">
-                        {{ __('Produk Saya') }}
+                     <x-nav-link :href="route('seller.products.index')" :active="request()->routeIs('seller.products.index')">
+                        {{ __('Produk') }}
+                    </x-nav-link>
+                    <!-- DITAMBAHKAN: Link Pesanan -->
+                    <x-nav-link :href="route('seller.orders.index')" :active="request()->routeIs('seller.orders.index')">
+                        {{ __('Pesanan') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -38,7 +42,7 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('seller.profile.edit')">
-                            {{ __('Profil Toko') }}
+                            {{ __('Profile') }}
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -73,8 +77,12 @@
             <x-responsive-nav-link :href="route('seller.dashboard')" :active="request()->routeIs('seller.dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('seller.products.index')" :active="request()->routeIs('seller.products.*')">
-                {{ __('Produk Saya') }}
+            <x-responsive-nav-link :href="route('seller.products.index')" :active="request()->routeIs('seller.products.index')">
+                {{ __('Produk') }}
+            </x-responsive-nav-link>
+            <!-- DITAMBAHKAN: Link Pesanan (Responsive) -->
+             <x-responsive-nav-link :href="route('seller.orders.index')" :active="request()->routeIs('seller.orders.index')">
+                {{ __('Pesanan') }}
             </x-responsive-nav-link>
         </div>
 
@@ -86,8 +94,8 @@
             </div>
 
             <div class="mt-3 space-y-1">
-                 <x-responsive-nav-link :href="route('seller.profile.edit')">
-                    {{ __('Profil Toko') }}
+                <x-responsive-nav-link :href="route('seller.profile.edit')">
+                    {{ __('Profile') }}
                 </x-responsive-nav-link>
 
                 <!-- Authentication -->
@@ -104,3 +112,4 @@
         </div>
     </div>
 </nav>
+
