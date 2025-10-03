@@ -45,8 +45,8 @@ Route::middleware('auth:web')->group(function () {
     // --- Rute Pesanan & Checkout ---
     Route::get('/checkout', [OrderController::class, 'checkout'])->name('orders.checkout');
     Route::post('/orders/process', [OrderController::class, 'process'])->name('orders.process');
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/riwayat-pesanan', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/riwayat-pesanan/{order}', [OrderController::class, 'show'])->name('orders.show');
 });
 
 // --- Rute Otentikasi & Dashboard Seller ---
