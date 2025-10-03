@@ -26,6 +26,9 @@ if (Auth::guard('web')->check()) {
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Dashboard') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.index')">
+                            {{ __('Riwayat Pesanan') }}
+                        </x-nav-link> 
                     @endauth
                 </div>
             </div>
@@ -61,10 +64,11 @@ if (Auth::guard('web')->check()) {
                             <x-dropdown-link :href="route('profile.edit')">
                                 {{ __('Profil') }}
                             </x-dropdown-link>
-                            <x-dropdown-link :href="route('orders.index')">
-                                {{ __('Riwayat Pesanan') }}
-                            </x-dropdown-link>
-
+                            @auth('web')
+                                <x-dropdown-link :href="route('orders.index')">
+                                    {{ __('Riwayat Pesanan') }}
+                                </x-dropdown-link>
+                            @endauth
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -103,9 +107,12 @@ if (Auth::guard('web')->check()) {
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                     {{ __('Dashboard') }}
                 </x-responsive-nav-link>
-                 <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.index')">
+                <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.index')">
                     {{ __('Keranjang') }} ({{$itemCount}})
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.index')">
+                    {{ __('Riwayat Pesanan') }}
+                </x-responsive-nav-link> 
             @endauth
         </div>
 
@@ -121,10 +128,12 @@ if (Auth::guard('web')->check()) {
                     <x-responsive-nav-link :href="route('profile.edit')">
                         {{ __('Profil') }}
                     </x-responsive-nav-link>
-                     <x-responsive-nav-link :href="route('orders.index')">
-                        {{ __('Riwayat Pesanan') }}
-                    </x-responsive-nav-link>
-
+                    @auth
+                        <x-responsive-nav-link :href="route('orders.index')" :active="request()->routeIs('orders.index')">
+                            {{ __('Riwayat Pesanan') }}
+                        </x-responsive-nav-link>                        
+                    @endauth
+                    
                     <!-- Authentication -->
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
