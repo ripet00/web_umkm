@@ -25,9 +25,9 @@ class OrderController extends Controller
     }
 
     public function checkout() {
-        $cart = Cart::with('items.product')->where('user_id', Auth::id())->firstOrFail();
+        $cart = Cart::with('items.product')->where('user_id', Auth::id())->first();
 
-        if ($cart->items->isEmpty()) {
+        if (!$cart || $cart->items->isEmpty()) {
             return redirect()->route('home')->with('error', 'Keranjang Anda kosong!');
         }
 
@@ -91,17 +91,14 @@ class OrderController extends Controller
                     'first_name' => $user->nama,
                     'email' => $user->email,
                     'phone' => $user->no_hp,
-                ],
+                ],  
             ];
 
             $snapToken = Snap::getSnapToken($midtrans_params);
             $mainOrder->snap_token = $snapToken;
             $mainOrder->save();
 
-            // Pindahkan ini ke setelah pembayaran berhasil via webhook
-            // $cart->items()->delete(); 
-
-            return view('orders.payment', ['snapToken' => $snapToken, 'order' => $mainOrder]); // DIPERBAIKI
+            return view('orders.payment', ['snapToken' => $snapToken, 'order' => $mainOrder]);
 
         } catch (\Exception $e) {
             return redirect()->route('orders.checkout')->with('error', 'Gagal memproses pesanan: ' . $e->getMessage());
@@ -147,30 +144,32 @@ class OrderController extends Controller
     {
         DB::transaction(function () use ($order) {
             if ($order->payment_status == 'unpaid') {
-                $order->update(['payment_status' => 'paid']);
+                $order->update(['payment_status' => 'paid', 'status' => 'processing']);
 
                 foreach ($order->items as $item) {
-                    $product = Product::find($item->product_id);
-                    DB::table('products')->where('id', $product->id)->lockForUpdate()->decrement('stok', $item->quantity);
+                    Product::find($item->product_id)->decrement('stok', $item->quantity);
                 }
-                 // Hapus item keranjang setelah pembayaran berhasil
+                
                 $cart = Cart::where('user_id', $order->user_id)->first();
-                if ($cart) {
-                    // Ambil semua product_id dari pesanan ini
-                    $orderedProductIds = $order->items()->pluck('product_id');
-                    // Hapus item dari keranjang yang sesuai dengan produk yang dipesan
+                if($cart) {
+                    $orderedProductIds = $order->items->pluck('product_id');
                     $cart->items()->whereIn('product_id', $orderedProductIds)->delete();
                 }
             }
         });
     }
 
+    // HALAMAN RIWAYAT PESANAN USER
     public function index()
     {
-        $orders = Order::where('user_id', Auth::id())->with('items.product')->latest()->get();
+        $orders = Order::where('user_id', Auth::id())
+                        ->with('items.product')
+                        ->latest() // Mengurutkan dari yang terbaru
+                        ->paginate(10); // Menggunakan paginasi
         return view('orders.index', compact('orders'));
     }
 
+    // HALAMAN DETAIL PESANAN USER
     public function show(Order $order)
     {
         if ($order->user_id !== Auth::id()) {
