@@ -13,6 +13,9 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+        <!-- Additional Styles -->
+        @stack('styles')
     </head>
     <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900">
         <div class="min-h-screen flex flex-col">
@@ -34,6 +37,8 @@
 
             @include('partials.footer')
         </div>
+
+        <!-- Additional Scripts -->
+        @stack('scripts')
     </body>
 </html>
-
