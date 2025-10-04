@@ -80,8 +80,7 @@ if (Auth::guard('web')->check()) {
                         </x-slot>
                     </x-dropdown>
                 @else
-                    <a href="{{ route('login') }}" class="text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">Log in</a>
-                    <a href="{{ route('user.register') }}" class="ms-4 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md">Register</a>
+                    <a href="{{ route('login') }}" class="ms-4 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-md">Login</a>
                 @endauth
             </div>
 
