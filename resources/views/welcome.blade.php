@@ -8,11 +8,15 @@
     </head>
     <body class="antialiased bg-gray-100 dark:bg-gray-900">
         {{-- Kontainer untuk memusatkan konten secara vertikal dan horizontal --}}
-        <div class="flex items-center justify-center min-h-screen">
+        <div class="flex flex-col items-center justify-center min-h-screen">
             {{-- Styling Profesional untuk Teks --}}
             <h1 class="text-5xl md:text-7xl font-extrabold text-gray-800 dark:text-white tracking-wider animate-pulse">
-                UMKM
+                AMPUH
             </h1>
+            <br>
+            <h3 class="text-xl md:text-2xl font-semibold text-gray-600 dark:text-gray-300 tracking-wide">
+                Aplikasi Merah Putih Universitas Hasanuddin
+            </h3>
         </div>
 
         <script>
