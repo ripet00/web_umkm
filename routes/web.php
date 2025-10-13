@@ -61,18 +61,27 @@ Route::prefix('seller')->name('seller.')->group(function () {
     
     // Rute untuk Seller yang Terotentikasi
     Route::middleware('auth:seller')->group(function () {
-        Route::get('/dashboard', function () { return view('sellers.dashboard'); })->name('dashboard');
+        Route::get('/dashboard', function () { return view('seller.dashboard'); })->name('dashboard');
         Route::post('logout', [SellerLoginController::class, 'destroy'])->name('logout');
         
+        // Routes untuk Product
         Route::resource('products', ProductController::class);
+        
+        // Routes tambahan untuk image management
+        Route::post('products/{product}/images/{image}/set-primary', [ProductController::class, 'setPrimaryImage'])
+            ->name('products.images.set-primary');
+        Route::delete('products/{product}/images/{image}', [ProductController::class, 'deleteImage'])
+            ->name('products.images.delete');
 
         Route::get('/profile', [SellerProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [SellerProfileController::class, 'update'])->name('profile.update');
         
         // --- Rute Pesanan Seller ---
         Route::get('/orders', [SellerOrderController::class, 'index'])->name('orders.index');
+        
     });
 });
+
 
 require __DIR__.'/auth.php';
 
