@@ -38,10 +38,10 @@
                                 @forelse ($products as $product)
                                     <tr>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            @if($product->gambar_produk)
-                                                <img src="{{ asset('storage/' . $product->gambar_produk) }}" alt="{{ $product->nama_produk }}" class="h-10 w-10 object-cover rounded-md">
+                                            @if($product->primaryImage)
+                                                <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" alt="{{ $product->nama_produk }}" class="h-10 w-10 object-cover rounded-md">
                                             @else
-                                                <div class="h-10 w-10 bg-gray-200 rounded-md flex items-center justify-center text-xs text-gray-500">No Image</div>
+                                                <div class="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-md flex items-center justify-center text-xs text-gray-500 dark:text-gray-400">No Image</div>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{{ $product->nama_produk }}</td>
