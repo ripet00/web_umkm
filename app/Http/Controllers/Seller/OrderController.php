@@ -24,7 +24,7 @@ class OrderController extends Controller
                         ->latest()
                         ->paginate(10);
                         
-        return view('sellers.orders.index', compact('orders'));
+        return view('seller.orders.index', compact('orders'));
     }
 }
 
