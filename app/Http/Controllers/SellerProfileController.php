@@ -12,7 +12,7 @@ class SellerProfileController extends Controller
 {
     public function edit(Request $request)
     {
-        return view('sellers.profile.edit', [
+        return view('seller.profile.edit', [
             'seller' => $request->user('seller'),
         ]);
     }

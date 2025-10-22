@@ -41,6 +41,13 @@
             <x-input-error :messages="$errors->get('jenis_usaha')" class="mt-2" />
         </div>
 
+        <!-- No. HP -->
+        <div class="mt-4">
+            <x-input-label for="no_hp" value="No. HP" />
+            <x-text-input id="no_hp" class="block mt-1 w-full" type="text" name="no_hp" :value="old('no_hp')" required />
+            <x-input-error :messages="$errors->get('no_hp')" class="mt-2" />
+        </div>
+
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />

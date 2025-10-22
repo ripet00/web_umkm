@@ -43,6 +43,7 @@ class SellerRegisterController extends Controller
             'kecamatan' => $request->kecamatan,
             'desa_kelurahan' => $request->desa_kelurahan,
             'jenis_usaha' => $request->jenis_usaha,
+            'no_hp' => $request->no_hp,
         ]);
 
         event(new Registered($seller));
