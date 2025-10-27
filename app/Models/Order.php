@@ -4,38 +4,91 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
     use HasFactory;
 
-    // Tambahkan 'nomor_pesanan', 'total_harga', dan 'snap_token' ke $fillable
     protected $fillable = [
         'user_id',
         'seller_id',
         'order_number',
         'total_price',
         'status',
-        'payment_status',    
-        'payment_gateway',  
+        'payment_status',
+        'payment_gateway',
         'snap_token',
     ];
 
-    public function user(): BelongsTo
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'total_price' => 'decimal:2',
+    ];
+
+    // Relationships
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function seller(): BelongsTo
+    public function seller()
     {
         return $this->belongsTo(Seller::class);
     }
 
-    public function items(): HasMany
+    public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
     }
-}
 
+    /**
+     * Alias for orderItems relationship
+     */
+    public function items()
+    {
+        return $this->orderItems();
+    }
+
+    // Helper Methods
+    public function getStatusBadgeColorAttribute()
+    {
+        return match($this->status) {
+            'pending' => 'yellow',
+            'processing' => 'blue',
+            'shipped' => 'indigo',
+            'completed' => 'green',
+            'cancelled' => 'red',
+            default => 'gray',
+        };
+    }
+
+    public function getStatusLabelAttribute()
+    {
+        return match($this->status) {
+            'pending' => 'Menunggu Pembayaran',
+            'processing' => 'Diproses',
+            'shipped' => 'Dikirim',
+            'completed' => 'Selesai',
+            'cancelled' => 'Dibatalkan',
+            default => ucfirst($this->status),
+        };
+    }
+
+    public function getPaymentStatusLabelAttribute()
+    {
+        return match($this->payment_status) {
+            'unpaid' => 'Belum Dibayar',
+            'paid' => 'Sudah Dibayar',
+            'expired' => 'Kadaluarsa',
+            'refund' => 'Refund',
+            default => ucfirst($this->payment_status),
+        };
+    }
+
+    // Accessor untuk compatibility dengan view yang menggunakan 'total'
+    public function getTotalAttribute()
+    {
+        return $this->total_price;
+    }
+}

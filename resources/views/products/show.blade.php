@@ -60,7 +60,7 @@
                         <div class="flex-grow">
                             <a href="{{ route('home', ['category' => $product->category->slug ?? '']) }}" 
                                class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
-                                {{ $product->category->nama_kategori ?? 'N/A' }}
+                                {{ $product->category->name ?? 'N/A' }}
                             </a>
                             <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">
                                 {{ $product->nama_produk }}
@@ -88,13 +88,14 @@
                             </div>
                         </div>
 
-                        <!-- Form Tambah ke Keranjang -->
+                        <!-- Form Tambah ke Keranjang & Wishlist -->
                         @auth('web')
                             <div class="mt-6">
-                                <form action="{{ route('cart.store') }}" method="POST">
+                                <form action="{{ route('cart.store') }}" method="POST" id="add-to-cart-form">
                                     @csrf
                                     <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                    <div class="flex items-center space-x-4">
+                                    
+                                    <div class="flex items-center space-x-4 mb-3">
                                         <div class="w-24">
                                             <x-input-label for="quantity" value="Jumlah" class="sr-only" />
                                             <x-text-input id="quantity" 
@@ -108,14 +109,29 @@
                                         <x-primary-button type="submit" class="flex-1" :disabled="$product->stok < 1">
                                             {{ $product->stok < 1 ? 'Stok Habis' : 'Tambah ke Keranjang' }}
                                         </x-primary-button>
+                                        
+                                        {{-- Wishlist Button --}}
+                                        <button type="button" 
+                                                onclick="toggleWishlistDetail({{ $product->id }})" 
+                                                id="wishlist-btn-detail"
+                                                class="flex-shrink-0 p-3 border-2 {{ $product->isInWishlist() ? 'border-pink-500 bg-pink-50 dark:bg-pink-900/20' : 'border-gray-300 dark:border-gray-600' }} rounded-lg hover:border-pink-500 dark:hover:border-pink-500 transition group/wishlist"
+                                                title="{{ $product->isInWishlist() ? 'Hapus dari wishlist' : 'Tambah ke wishlist' }}">
+                                            <svg class="w-6 h-6 {{ $product->isInWishlist() ? 'text-pink-500 fill-current' : 'text-gray-400' }} group-hover/wishlist:scale-110 transition-transform" 
+                                                 fill="none" 
+                                                 stroke="currentColor" 
+                                                 viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                            </svg>
+                                        </button>
                                     </div>
+                                    
                                     @error('quantity')
                                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                                     @enderror
                                 </form>
                             </div>
                         @else
-                            <div class="mt-6">
+                            <div class="mt-6 space-y-3">
                                 <a href="{{ route('login') }}" 
                                    class="block w-full text-center bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-semibold py-2 px-4 rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition">
                                     Login untuk Membeli
@@ -128,8 +144,19 @@
         </div>
     </div>
 
+    {{-- Toast Notification --}}
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 max-w-sm z-50 border-l-4 transition">
+        <div class="flex items-center">
+            <div id="toast-icon" class="flex-shrink-0 mr-3"></div>
+            <p id="toast-message" class="text-sm font-medium text-gray-900 dark:text-gray-100"></p>
+        </div>
+    </div>
+
     @push('scripts')
     <script>
+    // CSRF Token
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
     // Array untuk menyimpan semua URL gambar
     const imageUrls = [
         @foreach($product->images as $image)
@@ -171,7 +198,7 @@
         changeMainImage(imageUrls[currentIndex], currentIndex);
     });
 
-    // Keyboard navigation (optional)
+    // Keyboard navigation
     document.addEventListener('keydown', function(e) {
         if (e.key === 'ArrowLeft') {
             document.getElementById('prevImage')?.click();
@@ -179,6 +206,123 @@
             document.getElementById('nextImage')?.click();
         }
     });
+
+    // Toggle Wishlist Function
+    function toggleWishlistDetail(productId) {
+        if (!csrfToken) {
+            alert('Please login first');
+            window.location.href = '/login';
+            return;
+        }
+        
+        fetch('/wishlist/toggle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ product_id: productId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const btn = document.getElementById('wishlist-btn-detail');
+                const svg = btn?.querySelector('svg');
+                
+                if (data.action === 'added') {
+                    btn.classList.add('border-pink-500', 'bg-pink-50', 'dark:bg-pink-900/20');
+                    btn.classList.remove('border-gray-300', 'dark:border-gray-600');
+                    svg.classList.add('text-pink-500', 'fill-current');
+                    svg.classList.remove('text-gray-400');
+                    btn.setAttribute('title', 'Hapus dari wishlist');
+                    showToast('Ditambahkan ke wishlist ❤️', 'success');
+                } else {
+                    btn.classList.remove('border-pink-500', 'bg-pink-50', 'dark:bg-pink-900/20');
+                    btn.classList.add('border-gray-300', 'dark:border-gray-600');
+                    svg.classList.remove('text-pink-500', 'fill-current');
+                    svg.classList.add('text-gray-400');
+                    btn.setAttribute('title', 'Tambah ke wishlist');
+                    showToast('Dihapus dari wishlist', 'success');
+                }
+            } else {
+                showToast(data.message || 'Terjadi kesalahan', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Terjadi kesalahan', 'error');
+        });
+    }
+
+    // Add to Cart Handler
+    const addToCartForm = document.getElementById('add-to-cart-form');
+    if (addToCartForm) {
+        addToCartForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showToast('Produk ditambahkan ke keranjang 🛒', 'success');
+                    // Update cart count if you have cart badge in navbar
+                    updateCartCount();
+                } else {
+                    showToast(data.message || 'Gagal menambahkan ke keranjang', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan', 'error');
+            });
+        });
+    }
+
+    // Show Toast Notification
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        if (!toast) return;
+        
+        const toastMessage = document.getElementById('toast-message');
+        const toastIcon = document.getElementById('toast-icon');
+        
+        toastMessage.textContent = message;
+        
+        if (type === 'success') {
+            toast.className = 'fixed bottom-4 right-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 max-w-sm z-50 border-l-4 border-green-500 transition';
+            toastIcon.innerHTML = '<svg class="w-6 h-6 text-green-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>';
+        } else {
+            toast.className = 'fixed bottom-4 right-4 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 max-w-sm z-50 border-l-4 border-red-500 transition';
+            toastIcon.innerHTML = '<svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>';
+        }
+        
+        toast.classList.remove('hidden');
+        setTimeout(() => toast.classList.add('hidden'), 3000);
+    }
+
+    // Update cart count (optional - if you have cart badge)
+    function updateCartCount() {
+        fetch('/cart/count')
+            .then(response => response.json())
+            .then(data => {
+                const cartBadge = document.querySelector('.cart-count');
+                if (cartBadge && data.count !== undefined) {
+                    cartBadge.textContent = data.count;
+                    cartBadge.classList.remove('hidden');
+                }
+            })
+            .catch(error => console.error('Error updating cart count:', error));
+    }
     </script>
     @endpush
 </x-app-layout>

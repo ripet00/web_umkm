@@ -132,7 +132,14 @@
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{{ $product->category->nama_kategori ?? 'Tanpa Kategori' }}</p>
                                     <h3 class="font-semibold text-lg truncate mt-1 text-gray-900 dark:text-gray-100">{{ $product->nama_produk }}</h3>
                                     <p class="text-gray-800 dark:text-gray-200 text-md mt-1">Rp {{ number_format($product->harga, 0, ',', '.') }}</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 truncate">Penjual: {{ $product->seller->nama_koperasi }}</p>
+                                    <div class="mt-2 flex items-center justify-between">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 truncate">Penjual: {{ $product->seller->nama_koperasi }}</p>
+                                        <button class="p-1 text-gray-400 hover:text-pink-500 transition">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </a>
