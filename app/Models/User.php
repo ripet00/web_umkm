@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -22,8 +23,10 @@ class User extends Authenticatable
         'nama',
         'email',
         'password',
+        'avatar',
         'alamat',
         'no_hp',
+        'wallet_address',
     ];
 
     /**
@@ -52,5 +55,24 @@ class User extends Authenticatable
     public function cart()
     {
         return $this->hasOne(Cart::class);
+    }
+
+    // User has many orders
+    public function orders()
+    {
+        return $this->hasMany(\App\Models\Order::class);
+    }
+
+    // User has many wishlists
+    public function wishlists()
+    {
+        return $this->hasMany(\App\Models\Wishlist::class);
+    }
+
+    // User has many products through wishlist (Many to Many)
+    public function wishlistProducts(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\Product::class, 'wishlists')
+                    ->withTimestamps();
     }
 }

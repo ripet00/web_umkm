@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SellerRegisterController;
@@ -27,14 +29,21 @@ Route::get('login', function() { return view('auth.login'); })->middleware('gues
 Route::get('user/login', function() { return view('auth.user-login'); })->middleware('guest:web')->name('user.login');
 Route::get('user/register', function() { return view('auth.user-register'); })->middleware('guest:web')->name('user.register');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth:web', 'verified'])->name('dashboard');
+// ← UPDATE BAGIAN INI
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth:web', 'verified'])
+    ->name('dashboard');
 
 Route::middleware('auth:web')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+     // Wishlist routes
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist', [WishlistController::class, 'store'])->name('wishlist.store');
+    Route::delete('/wishlist/{product}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
+    Route::post('/wishlist/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
     // --- Rute Keranjang Belanja ---
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
@@ -75,6 +84,7 @@ Route::prefix('seller')->name('seller.')->group(function () {
 
         Route::get('/profile', [SellerProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [SellerProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/profile', [SellerProfileController::class, 'destroy'])->name('profile.destroy');
         
         // --- Rute Pesanan Seller ---
         Route::get('/orders', [SellerOrderController::class, 'index'])->name('orders.index');
@@ -83,5 +93,6 @@ Route::prefix('seller')->name('seller.')->group(function () {
 });
 
 
-require __DIR__.'/auth.php';
 
+
+require __DIR__.'/auth.php';
