@@ -27,6 +27,14 @@ class ProductController extends Controller
 
     public function create()
     {
+        $seller = Auth::guard('seller')->user();
+        
+        // Cek apakah seller sudah aktif
+        if (!$seller->isActivated()) {
+            return redirect()->route('seller.activation.index')
+                ->with('warning', 'Silakan aktivasi akun Anda terlebih dahulu sebelum menambah produk.');
+        }
+        
         $categories = Category::all();
         return view('seller.products.create', compact('categories'));
     }
@@ -35,9 +43,15 @@ class ProductController extends Controller
     {
         $seller = Auth::guard('seller')->user();
         
+        // Cek apakah seller sudah aktif
+        if (!$seller->isActivated()) {
+            return redirect()->route('seller.activation.index')
+                ->with('warning', 'Silakan aktivasi akun Anda terlebih dahulu sebelum menambah produk.');
+        }
+
         $validated = $request->validate([
+            'category_id' => 'required|exists:categories,id',
             'nama_produk' => 'required|string|max:255',
-            'category_id' => 'nullable|exists:categories,id',
             'deskripsi' => 'nullable|string',
             'harga' => 'required|numeric|min:0',
             'stok' => 'required|integer|min:0',
@@ -50,9 +64,7 @@ class ProductController extends Controller
             'images.*.image' => 'File harus berupa gambar',
             'images.*.mimes' => 'Format gambar harus: jpeg, png, jpg, gif, atau webp',
             'images.*.max' => 'Ukuran gambar maksimal 2MB',
-        ]);
-
-        DB::beginTransaction();
+        ]);        DB::beginTransaction();
         try {
             // Buat produk
             $product = Product::create([
@@ -120,7 +132,7 @@ class ProductController extends Controller
 
     public function update(Request $request, Product $product)
     {
-            \Log::channel('single')->info('==== UPDATE METHOD CALLED ====', [
+            Log::channel('single')->info('==== UPDATE METHOD CALLED ====', [
             'product_id' => $product->id,
             'method' => $request->method(),
             'url' => $request->fullUrl(),
@@ -199,7 +211,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
             // LOG DI AWAL METHOD
-        \Log::channel('single')->info('==== DESTROY METHOD CALLED ====', [
+        Log::channel('single')->info('==== DESTROY METHOD CALLED ====', [
             'product_id' => $product->id,
             'seller_id' => Auth::guard('seller')->id(),
         ]);
