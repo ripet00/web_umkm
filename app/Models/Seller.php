@@ -22,6 +22,8 @@ class Seller extends Authenticatable
         'alamat_toko',
         'deskripsi_toko',
         'foto_profil',
+        'merchant_id',
+        'is_active',
     ];
 
     /**
@@ -39,6 +41,7 @@ class Seller extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -47,9 +50,25 @@ class Seller extends Authenticatable
         return $this->hasMany(Product::class);
     }
 
-    // Relationship dengan Order - TAMBAHKAN INI
+    // Relationship dengan Order
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    /**
+     * Check if seller is active and has merchant ID
+     */
+    public function isActivated(): bool
+    {
+        return $this->is_active && !empty($this->merchant_id);
+    }
+
+    /**
+     * Check if seller can sell products
+     */
+    public function canSell(): bool
+    {
+        return $this->isActivated();
     }
 }
