@@ -43,7 +43,15 @@ class OrderController extends Controller
             return redirect()->route('cart.index')->with('error', 'Tidak ada item di keranjang untuk di-checkout.');
         }
         
+        // Cek apakah semua seller sudah aktif
         $itemsBySeller = $cart->items->groupBy('product.seller_id');
+        foreach ($itemsBySeller as $sellerId => $items) {
+            $seller = $items->first()->product->seller;
+            if (!$seller->isActivated()) {
+                return redirect()->route('cart.index')
+                    ->with('error', 'Seller "' . $seller->nama_koperasi . '" belum mengaktifkan akun Midtrans. Silakan hubungi seller untuk aktivasi.');
+            }
+        }
 
         try {
             $orders = DB::transaction(function () use ($user, $itemsBySeller) {
@@ -81,7 +89,9 @@ class OrderController extends Controller
             });
             
             $mainOrder = $orders[0];
+            $seller = $mainOrder->seller;
 
+            // Gunakan Merchant ID dari seller untuk pembayaran
             $midtrans_params = [
                 'transaction_details' => [
                     'order_id' => $mainOrder->order_number,
@@ -91,7 +101,10 @@ class OrderController extends Controller
                     'first_name' => $user->nama,
                     'email' => $user->email,
                     'phone' => $user->no_hp,
-                ],  
+                ],
+                // Tambahkan merchant ID untuk split payment
+                'custom_field1' => $seller->merchant_id, // Merchant ID seller
+                'custom_field2' => 'seller_payment', // Identifier untuk payment ke seller
             ];
 
             $snapToken = Snap::getSnapToken($midtrans_params);
