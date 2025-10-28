@@ -73,6 +73,11 @@ Route::prefix('seller')->name('seller.')->group(function () {
         Route::get('/dashboard', function () { return view('seller.dashboard'); })->name('dashboard');
         Route::post('logout', [SellerLoginController::class, 'destroy'])->name('logout');
         
+        // Routes untuk Aktivasi Seller
+        Route::get('/activation', [App\Http\Controllers\Seller\ActivationController::class, 'index'])->name('activation.index');
+        Route::put('/activation', [App\Http\Controllers\Seller\ActivationController::class, 'update'])->name('activation.update');
+        Route::patch('/activation/deactivate', [App\Http\Controllers\Seller\ActivationController::class, 'deactivate'])->name('activation.deactivate');
+        
         // Routes untuk Product
         Route::resource('products', ProductController::class);
         
@@ -92,7 +97,8 @@ Route::prefix('seller')->name('seller.')->group(function () {
     });
 });
 
-
+// --- Rute Profil Seller (Public) - HARUS SETELAH seller auth routes ---
+Route::get('/seller/{seller}', [SellerProfileController::class, 'show'])->name('seller.profile.show');
 
 
 require __DIR__.'/auth.php';
