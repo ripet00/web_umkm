@@ -18,7 +18,11 @@
                      <x-nav-link :href="route('seller.products.index')" :active="request()->routeIs('seller.products.index')">
                         {{ __('Produk') }}
                     </x-nav-link>
-                    <!-- DITAMBAHKAN: Link Pesanan -->
+                    <!-- Link Aktivasi -->
+                    <x-nav-link :href="route('seller.activation.index')" :active="request()->routeIs('seller.activation.*')">
+                        {{ __('Aktivasi') }}
+                    </x-nav-link>
+                    <!-- Link Pesanan -->
                     <x-nav-link :href="route('seller.orders.index')" :active="request()->routeIs('seller.orders.index')">
                         {{ __('Pesanan') }}
                     </x-nav-link>
@@ -41,6 +45,10 @@
                     </x-slot>
 
                     <x-slot name="content">
+                        <x-dropdown-link :href="route('seller.activation.index')">
+                            {{ __('Aktivasi Akun') }}
+                        </x-dropdown-link>
+                        
                         <x-dropdown-link :href="route('seller.profile.edit')">
                             {{ __('Profile') }}
                         </x-dropdown-link>
