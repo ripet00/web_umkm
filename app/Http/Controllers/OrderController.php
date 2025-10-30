@@ -6,17 +6,23 @@ use App\Models\Cart;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\OrderItem;
+use App\Services\EQBRBlockchainService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 
 class OrderController extends Controller
 {
-    public function __construct() {
+    protected $blockchainService;
+
+    public function __construct(EQBRBlockchainService $blockchainService) {
+        $this->blockchainService = $blockchainService;
+        
         Config::$serverKey = config('midtrans.server_key');
         Config::$clientKey = config('midtrans.client_key');
         Config::$isProduction = config('midtrans.is_production');
@@ -168,8 +174,78 @@ class OrderController extends Controller
                     $orderedProductIds = $order->items->pluck('product_id');
                     $cart->items()->whereIn('product_id', $orderedProductIds)->delete();
                 }
+
+                // Hash transaksi ke blockchain EQBR setelah pembayaran berhasil
+                $this->hashOrderToBlockchain($order);
             }
         });
+    }
+
+    /**
+     * Hash order ke blockchain EQBR
+     */
+    private function hashOrderToBlockchain(Order $order): void
+    {
+        try {
+            // Set status blockchain sebagai pending
+            $order->update(['blockchain_status' => 'pending']);
+
+            Log::info('Starting blockchain hash for order', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number
+            ]);
+
+            $result = $this->blockchainService->hashTransaction($order);
+            
+            if ($result['success']) {
+                $order->update([
+                    'blockchain_hash' => $result['blockchain_hash'],
+                    'blockchain_transaction_id' => $result['transaction_id'],
+                    'block_number' => $result['block_number'],
+                    'transaction_data_hash' => $result['local_hash'],
+                    'blockchain_metadata' => [
+                        'network_id' => $result['network_id'] ?? null,
+                        'raw_response' => $result['raw_response'] ?? null,
+                        'hashed_at' => now()->toISOString(),
+                    ],
+                    'blockchain_created_at' => now(),
+                    'blockchain_status' => 'confirmed',
+                ]);
+                
+                Log::info('Order successfully hashed to blockchain', [
+                    'order_id' => $order->id,
+                    'blockchain_hash' => $result['blockchain_hash'],
+                    'transaction_id' => $result['transaction_id']
+                ]);
+            } else {
+                $order->update([
+                    'blockchain_status' => 'failed',
+                    'blockchain_metadata' => [
+                        'error' => $result['error'] ?? 'Unknown error',
+                        'failed_at' => now()->toISOString(),
+                    ]
+                ]);
+                
+                Log::error('Failed to hash order to blockchain', [
+                    'order_id' => $order->id,
+                    'error' => $result['error'] ?? 'Unknown error'
+                ]);
+            }
+        } catch (\Exception $e) {
+            $order->update([
+                'blockchain_status' => 'failed',
+                'blockchain_metadata' => [
+                    'exception' => $e->getMessage(),
+                    'failed_at' => now()->toISOString(),
+                ]
+            ]);
+            
+            Log::error('Blockchain hashing exception', [
+                'order_id' => $order->id,
+                'exception' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 
     // HALAMAN RIWAYAT PESANAN USER
