@@ -52,7 +52,7 @@ class BlockchainController extends Controller
             'order' => [
                 'id' => $order->id,
                 'order_number' => $order->order_number,
-                'total_amount' => $order->total_harga,
+                'total_amount' => $order->total_price,
                 'created_at' => $order->created_at->format('d M Y, H:i'),
                 'payment_status' => $order->payment_status,
                 'blockchain_status' => $order->blockchain_status,
