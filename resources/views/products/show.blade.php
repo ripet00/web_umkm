@@ -78,7 +78,16 @@
                             </div>
                             
                             <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Informasi Penjual</h3>
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="font-semibold text-gray-900 dark:text-gray-100">Informasi Penjual</h3>
+                                    <a href="{{ route('seller.profile.show', $product->seller) }}" 
+                                       class="inline-flex items-center px-3 py-1.5 text-sm font-medium rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors">
+                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-2m-2 0H7m5 0v-5a2 2 0 012-2h2a2 2 0 012 2v5"></path>
+                                        </svg>
+                                        Kunjungi Toko
+                                    </a>
+                                </div>
                                 <p class="text-gray-600 dark:text-gray-400">
                                     {{ $product->seller->nama_koperasi }}
                                 </p>

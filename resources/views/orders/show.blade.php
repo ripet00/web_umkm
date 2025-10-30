@@ -43,9 +43,18 @@
                     <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
                         <div class="flex justify-between font-bold text-lg">
                             <span>Total Pembayaran</span>
-                            <span>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
+                            <span>Rp {{ number_format($order->total_price, 0, ',', '.') }}</span>
                         </div>
                     </div>
+
+                    {{-- Blockchain Status Section --}}
+                    @if($order->payment_status === 'paid')
+                        <x-blockchain-status 
+                            :hash="$order->blockchain_hash"
+                            :status="$order->blockchain_status ?? 'pending'"
+                            :transactionId="$order->blockchain_transaction_id"
+                        />
+                    @endif
                 </div>
             </div>
         </div>
