@@ -14,6 +14,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 use App\Http\Controllers\BlockchainController;
+use App\Http\Controllers\PublicTransactionController;
 
 
 // --- Rute Test Blockchain (Development Only) ---
@@ -33,6 +34,11 @@ Route::post('/midtrans/callback', [OrderController::class, 'callback'])->name('m
 Route::get('/blockchain/verify', [BlockchainController::class, 'verify'])->name('blockchain.verify');
 Route::post('/blockchain/check', [BlockchainController::class, 'check'])->name('blockchain.check');
 Route::get('/blockchain/transaction/{hash}', [BlockchainController::class, 'transaction'])->name('blockchain.transaction');
+
+// --- Rute Public Transparency ---
+Route::get('/transparency/transactions', [PublicTransactionController::class, 'index'])->name('public.transactions.index');
+Route::get('/transparency/transactions/{hash}', [PublicTransactionController::class, 'show'])->name('public.transactions.show');
+Route::get('/api/public/transactions', [PublicTransactionController::class, 'api'])->name('public.transactions.api');
 
 
 // --- Rute Halaman Login ---
