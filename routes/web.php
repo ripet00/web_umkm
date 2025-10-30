@@ -13,7 +13,13 @@ use App\Http\Controllers\SellerProfileController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
+use App\Http\Controllers\BlockchainController;
 
+
+// --- Rute Test Blockchain (Development Only) ---
+if (app()->environment('local')) {
+    include_once __DIR__ . '/test-blockchain.php';
+}
 
 // --- Rute Halaman Statis & Publik ---
 Route::get('/', [PageController::class, 'welcome'])->name('welcome');
@@ -22,6 +28,11 @@ Route::get('/products/{product}', [HomeController::class, 'show'])->name('produc
 
 // --- Rute Webhook Midtrans ---
 Route::post('/midtrans/callback', [OrderController::class, 'callback'])->name('midtrans.callback');
+
+// --- Rute Blockchain Verification ---
+Route::get('/blockchain/verify', [BlockchainController::class, 'verify'])->name('blockchain.verify');
+Route::post('/blockchain/check', [BlockchainController::class, 'check'])->name('blockchain.check');
+Route::get('/blockchain/transaction/{hash}', [BlockchainController::class, 'transaction'])->name('blockchain.transaction');
 
 
 // --- Rute Halaman Login ---
@@ -76,6 +87,7 @@ Route::prefix('seller')->name('seller.')->group(function () {
         // Routes untuk Aktivasi Seller
         Route::get('/activation', [App\Http\Controllers\Seller\ActivationController::class, 'index'])->name('activation.index');
         Route::put('/activation', [App\Http\Controllers\Seller\ActivationController::class, 'update'])->name('activation.update');
+        Route::patch('/activation', [App\Http\Controllers\Seller\ActivationController::class, 'update'])->name('activation.patch');
         Route::patch('/activation/deactivate', [App\Http\Controllers\Seller\ActivationController::class, 'deactivate'])->name('activation.deactivate');
         
         // Routes untuk Product
@@ -100,5 +112,7 @@ Route::prefix('seller')->name('seller.')->group(function () {
 // --- Rute Profil Seller (Public) - HARUS SETELAH seller auth routes ---
 Route::get('/seller/{seller}', [SellerProfileController::class, 'show'])->name('seller.profile.show');
 
+// Include blockchain test route
+require __DIR__.'/test-blockchain.php';
 
 require __DIR__.'/auth.php';
