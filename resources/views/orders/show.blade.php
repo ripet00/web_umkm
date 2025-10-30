@@ -46,6 +46,15 @@
                             <span>Rp {{ number_format($order->total_harga, 0, ',', '.') }}</span>
                         </div>
                     </div>
+
+                    {{-- Blockchain Status Section --}}
+                    @if($order->payment_status === 'paid')
+                        <x-blockchain-status 
+                            :hash="$order->blockchain_hash"
+                            :status="$order->blockchain_status ?? 'pending'"
+                            :transactionId="$order->blockchain_transaction_id"
+                        />
+                    @endif
                 </div>
             </div>
         </div>
