@@ -22,6 +22,9 @@ if (Auth::guard('web')->check()) {
                     <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
                         {{ __('Produk') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('blockchain.verify')" :active="request()->routeIs('blockchain.verify')">
+                        🔗 {{ __('Verifikasi Blockchain') }}
+                    </x-nav-link>
                     @auth('web')
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Dashboard') }}
