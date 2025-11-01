@@ -24,25 +24,31 @@ class ActivationController extends Controller
       return view('sellers.activation', compact('seller'));
   }
 
-  /**
+    /**
      * Update merchant ID dan aktivasi seller
      */
     public function update(Request $request): RedirectResponse
     {
         $request->validate([
             'merchant_id' => 'required|string|max:255',
+            'client_key' => 'required|string|max:255',
+            'server_key' => 'required|string|max:255',
         ], [
             'merchant_id.required' => 'Merchant ID wajib diisi.',
+            'client_key.required' => 'Client Key wajib diisi.',
+            'server_key.required' => 'Server Key wajib diisi.',
         ]);
 
         $seller = Auth::guard('seller')->user();
         $seller->update([
             'merchant_id' => $request->merchant_id,
+            'client_key' => $request->client_key,
+            'server_key' => $request->server_key,
             'is_active' => true,
         ]);
 
         return redirect()->route('seller.activation.index')
-            ->with('success', 'Merchant ID berhasil disimpan dan akun diaktifkan.');
+            ->with('success', 'Konfigurasi Midtrans berhasil disimpan dan akun diaktifkan.');
     }
 
     /**

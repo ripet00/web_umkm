@@ -97,7 +97,18 @@ class OrderController extends Controller
             $mainOrder = $orders[0];
             $seller = $mainOrder->seller;
 
-            // Gunakan Merchant ID dari seller untuk pembayaran
+            // Validasi bahwa seller memiliki konfigurasi Midtrans lengkap
+            if (!$seller->client_key || !$seller->server_key) {
+                throw new \Exception('Seller belum mengkonfigurasi Client Key dan Server Key Midtrans.');
+            }
+
+            // Gunakan konfigurasi Midtrans dari seller
+            Config::$serverKey = $seller->server_key;
+            Config::$clientKey = $seller->client_key;
+            Config::$isProduction = config('midtrans.is_production');
+            Config::$isSanitized = config('midtrans.is_sanitized');
+            Config::$is3ds = config('midtrans.is_3ds');
+
             $midtrans_params = [
                 'transaction_details' => [
                     'order_id' => $mainOrder->order_number,
@@ -108,13 +119,15 @@ class OrderController extends Controller
                     'email' => $user->email,
                     'phone' => $user->no_hp,
                 ],
-                // Tambahkan merchant ID untuk split payment
-                'custom_field1' => $seller->merchant_id, // Merchant ID seller
-                'custom_field2' => 'seller_payment', // Identifier untuk payment ke seller
+                // Informasi seller untuk tracking
+                'custom_field1' => $seller->merchant_id,
+                'custom_field2' => 'seller_payment_' . $seller->id,
+                'custom_field3' => $seller->nama_koperasi,
             ];
 
             $snapToken = Snap::getSnapToken($midtrans_params);
             $mainOrder->snap_token = $snapToken;
+            $mainOrder->client_key = $seller->client_key; // Simpan client key untuk frontend
             $mainOrder->save();
 
             return view('orders.payment', ['snapToken' => $snapToken, 'order' => $mainOrder]);

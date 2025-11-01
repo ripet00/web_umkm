@@ -19,6 +19,7 @@ class Order extends Model
         'payment_status',
         'payment_gateway',
         'snap_token',
+        'client_key',
         'blockchain_hash',
         'blockchain_transaction_id',
         'block_number',

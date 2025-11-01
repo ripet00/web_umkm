@@ -24,6 +24,8 @@ class Seller extends Authenticatable
         'foto_profil',
         'merchant_id',
         'is_active',
+        'client_key',
+        'server_key',
     ];
 
     /**
@@ -57,11 +59,14 @@ class Seller extends Authenticatable
     }
 
     /**
-     * Check if seller is active and has merchant ID
+     * Check if seller is active and has complete Midtrans configuration
      */
     public function isActivated(): bool
     {
-        return $this->is_active && !empty($this->merchant_id);
+        return $this->is_active && 
+               !empty($this->merchant_id) && 
+               !empty($this->client_key) && 
+               !empty($this->server_key);
     }
 
     /**
@@ -70,5 +75,15 @@ class Seller extends Authenticatable
     public function canSell(): bool
     {
         return $this->isActivated();
+    }
+
+    /**
+     * Check if seller has complete payment configuration
+     */
+    public function hasCompletePaymentConfig(): bool
+    {
+        return !empty($this->merchant_id) && 
+               !empty($this->client_key) && 
+               !empty($this->server_key);
     }
 }
