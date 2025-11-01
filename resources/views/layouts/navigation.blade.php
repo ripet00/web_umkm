@@ -28,6 +28,9 @@ if (Auth::guard('web')->check()) {
                     <x-nav-link :href="route('blockchain.verify')" :active="request()->routeIs('blockchain.verify')">
                         🔗 {{ __('Verifikasi') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('help.index')" :active="request()->routeIs('help.*')">
+                        💬 {{ __('Bantuan') }}
+                    </x-nav-link>
                     @auth('web')
                         <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                             {{ __('Dashboard') }}
@@ -107,6 +110,15 @@ if (Auth::guard('web')->check()) {
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
                 {{ __('Produk') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('public.transactions.index')" :active="request()->routeIs('public.transactions.*')">
+                🔍 {{ __('Transparansi') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('blockchain.verify')" :active="request()->routeIs('blockchain.verify')">
+                🔗 {{ __('Verifikasi') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('help.index')" :active="request()->routeIs('help.*')">
+                💬 {{ __('Bantuan') }}
             </x-responsive-nav-link>
             @auth('web')
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
