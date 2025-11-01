@@ -73,6 +73,32 @@
                             <p>• Verifikasi dapat dilakukan kapan saja oleh siapa pun</p>
                         </div>
                     </div>
+
+                    <!-- Download Panduan Section -->
+                    <div class="mt-8 bg-green-50 dark:bg-green-900/20 rounded-lg p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h4 class="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
+                                    📚 Panduan Lengkap
+                                </h4>
+                                <p class="text-sm text-green-800 dark:text-green-200">
+                                    Download panduan aktivasi dan verifikasi blockchain untuk memahami proses secara detail
+                                </p>
+                            </div>
+                            <a href="{{ asset('downloads/panduan_aktivasi.pdf') }}" 
+                               download="Panduan_Aktivasi_Blockchain_AMPUH.pdf"
+                               class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg
+                                      transition duration-200 ease-in-out transform hover:scale-105
+                                      focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+                                      flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Download PDF
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
