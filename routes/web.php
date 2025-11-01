@@ -15,6 +15,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 use App\Http\Controllers\BlockchainController;
 use App\Http\Controllers\PublicTransactionController;
+use App\Http\Controllers\HelpController;
 
 
 // --- Rute Test Blockchain (Development Only) ---
@@ -39,6 +40,10 @@ Route::get('/blockchain/transaction/{hash}', [BlockchainController::class, 'tran
 Route::get('/transparency/transactions', [PublicTransactionController::class, 'index'])->name('public.transactions.index');
 Route::get('/transparency/transactions/{hash}', [PublicTransactionController::class, 'show'])->name('public.transactions.show');
 Route::get('/api/public/transactions', [PublicTransactionController::class, 'api'])->name('public.transactions.api');
+
+// --- Rute Sistem Bantuan ---
+Route::get('/bantuan', [HelpController::class, 'index'])->name('help.index');
+Route::post('/bantuan', [HelpController::class, 'store'])->name('help.store');
 
 
 // --- Rute Halaman Login ---

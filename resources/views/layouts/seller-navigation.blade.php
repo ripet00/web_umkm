@@ -26,6 +26,10 @@
                     <x-nav-link :href="route('seller.orders.index')" :active="request()->routeIs('seller.orders.index')">
                         {{ __('Pesanan') }}
                     </x-nav-link>
+                    <!-- Link Bantuan -->
+                    <x-nav-link :href="route('help.index')" :active="request()->routeIs('help.*')">
+                        💬 {{ __('Bantuan') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -91,6 +95,10 @@
             <!-- DITAMBAHKAN: Link Pesanan (Responsive) -->
              <x-responsive-nav-link :href="route('seller.orders.index')" :active="request()->routeIs('seller.orders.index')">
                 {{ __('Pesanan') }}
+            </x-responsive-nav-link>
+            <!-- Link Bantuan (Responsive) -->
+            <x-responsive-nav-link :href="route('help.index')" :active="request()->routeIs('help.*')">
+                💬 {{ __('Bantuan') }}
             </x-responsive-nav-link>
         </div>
 

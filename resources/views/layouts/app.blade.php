@@ -32,7 +32,11 @@
 
             <!-- Page Content -->
             <main class="flex-grow">
-                {{ $slot }}
+                {{-- Support both component slot and classic section/yield --}}
+                @if(isset($slot))
+                    {{ $slot }}
+                @endif
+                @yield('content')
             </main>
 
             @include('partials.footer')
