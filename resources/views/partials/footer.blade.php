@@ -4,7 +4,7 @@
             <div>
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">AMPUH</h3>
                 <p class="mt-2 text-gray-600 dark:text-gray-400 text-sm">
-                    Mendukung pertumbuhan ekonomi digital dengan memberdayakan UMKM lokal melalui teknologi blockchain.
+                    Platform e-commerce UMKM terdepan dengan teknologi blockchain EQBR. Mendukung pertumbuhan ekonomi digital melalui transparansi transaksi dan pemberdayaan UMKM lokal Indonesia.
                 </p>
             </div>
             <div>

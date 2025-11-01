@@ -5,10 +5,7 @@
             <div class="text-center mb-4">
                 <a href="{{ route('home') }}" 
                    class="inline-flex items-center space-x-2 text-2xl font-semibold text-gray-800 dark:text-gray-200 hover:text-gray-600 dark:hover:text-gray-300 transition-colors duration-200">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                    </svg>
-                    <span>UMKM Marketplace</span>
+                    <span>AMPUH</span>
                 </a>
             </div>
 
@@ -76,7 +73,7 @@
             <!-- Footer -->
             <div class="text-center mt-4 pt-3 border-t border-gray-200 dark:border-gray-800">
                 <p class="text-gray-500 dark:text-gray-400 text-sm">
-                    Butuh bantuan? <a href="#" class="text-gray-600 dark:text-gray-300 hover:underline">Hubungi kami</a>
+                    Butuh bantuan? <a href="{{ route('help.index') }}" class="text-gray-600 dark:text-gray-300 hover:underline">Hubungi kami</a>
                 </p>
             </div>
         </div>
