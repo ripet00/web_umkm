@@ -29,10 +29,10 @@ class ProductController extends Controller
     {
         $seller = Auth::guard('seller')->user();
         
-        // Cek apakah seller sudah aktif
-        if (!$seller->isActivated()) {
+        // Cek apakah seller bisa manage products (hanya perlu is_active = true)
+        if (!$seller->canManageProducts()) {
             return redirect()->route('seller.activation.index')
-                ->with('warning', 'Silakan aktivasi akun Anda terlebih dahulu sebelum menambah produk.');
+                ->with('warning', 'Silakan aktivasi akun Anda terlebih dahulu sebelum mengelola produk.');
         }
         
         $categories = Category::all();
@@ -43,10 +43,10 @@ class ProductController extends Controller
     {
         $seller = Auth::guard('seller')->user();
         
-        // Cek apakah seller sudah aktif
-        if (!$seller->isActivated()) {
+        // Cek apakah seller bisa manage products
+        if (!$seller->canManageProducts()) {
             return redirect()->route('seller.activation.index')
-                ->with('warning', 'Silakan aktivasi akun Anda terlebih dahulu sebelum menambah produk.');
+                ->with('warning', 'Silakan aktivasi akun Anda terlebih dahulu sebelum mengelola produk.');
         }
 
         $validated = $request->validate([
