@@ -19,10 +19,24 @@ class EnsureSellerIsActive
         if (Auth::guard('seller')->check()) {
             $seller = Auth::guard('seller')->user();
             
-            // Jika seller belum aktif dan bukan mengakses halaman aktivasi
-            if (!$seller->isActivated() && !$request->routeIs('seller.activation.*')) {
+            // Jika seller belum aktif sama sekali (is_active = false)
+            if (!$seller->is_active && !$request->routeIs('seller.activation.*')) {
                 return redirect()->route('seller.activation.index')
-                    ->with('warning', 'Silakan aktivasi akun Anda terlebih dahulu dengan mengisi Merchant ID.');
+                    ->with('warning', 'Silakan aktivasi akun Anda terlebih dahulu.');
+            }
+
+            // Untuk route yang membutuhkan payment capability, check full activation
+            $paymentRequiredRoutes = [
+                'seller.orders.*',
+                'seller.financial.*',
+                'seller.payment.*'
+            ];
+
+            foreach ($paymentRequiredRoutes as $pattern) {
+                if ($request->routeIs($pattern) && !$seller->canReceivePayments()) {
+                    return redirect()->route('seller.activation.index')
+                        ->with('warning', 'Silakan lengkapi konfigurasi Midtrans untuk mengakses fitur pembayaran.');
+                }
             }
         }
 

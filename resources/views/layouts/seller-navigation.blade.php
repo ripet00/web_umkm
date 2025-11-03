@@ -19,8 +19,13 @@
                         {{ __('Produk') }}
                     </x-nav-link>
                     <!-- Link Aktivasi -->
-                    <x-nav-link :href="route('seller.activation.index')" :active="request()->routeIs('seller.activation.*')">
+                    <x-nav-link :href="route('seller.activation.index')" :active="request()->routeIs('seller.activation.*')" class="relative">
                         {{ __('Aktivasi') }}
+                        @if(!Auth::guard('seller')->user()->canReceivePayments())
+                            <span class="absolute -top-1 -right-1 w-3 h-3 bg-yellow-500 rounded-full flex items-center justify-center">
+                                <span class="w-2 h-2 bg-yellow-600 rounded-full animate-pulse"></span>
+                            </span>
+                        @endif
                     </x-nav-link>
                     <!-- Link Pesanan -->
                     <x-nav-link :href="route('seller.orders.index')" :active="request()->routeIs('seller.orders.index')">
@@ -49,8 +54,11 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('seller.activation.index')">
+                        <x-dropdown-link :href="route('seller.activation.index')" class="flex items-center relative">
                             {{ __('Aktivasi Akun') }}
+                            @if(!Auth::guard('seller')->user()->canReceivePayments())
+                                <span class="ml-2 w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></span>
+                            @endif
                         </x-dropdown-link>
                         
                         <x-dropdown-link :href="route('seller.profile.edit')">
