@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 py-12">
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg overflow-hidden">
             <div class="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8">
                 <h1 class="text-3xl font-bold text-white text-center">Pusat Bantuan AMPUH</h1>
                 <p class="text-blue-100 text-center mt-2">Kami siap membantu Anda 24/7</p>
@@ -18,11 +18,11 @@
 
                 <!-- FAQ Section -->
                 <div class="mb-8">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Pertanyaan yang Sering Diajukan</h2>
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Pertanyaan yang Sering Diajukan</h2>
                     
                     <div class="space-y-4">
-                        <div class="border border-gray-200 rounded-lg">
-                            <button class="w-full text-left px-4 py-3 font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:bg-gray-50" onclick="toggleFaq(1)">
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <button class="w-full text-left px-4 py-3 font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700" onclick="toggleFaq(1)">
                                 <div class="flex justify-between items-center">
                                     <span>Bagaimana cara berbelanja di AMPUH?</span>
                                     <svg class="w-5 h-5 transform transition-transform" id="icon-1">
@@ -30,7 +30,7 @@
                                     </svg>
                                 </div>
                             </button>
-                            <div class="hidden px-4 pb-3 text-gray-600" id="faq-1">
+                            <div class="hidden px-4 pb-3 text-gray-600 dark:text-gray-300" id="faq-1">
                                 <p>1. Daftar akun atau login sebagai pembeli</p>
                                 <p>2. Pilih produk yang Anda inginkan</p>
                                 <p>3. Tambahkan ke keranjang</p>
@@ -39,8 +39,8 @@
                             </div>
                         </div>
 
-                        <div class="border border-gray-200 rounded-lg">
-                            <button class="w-full text-left px-4 py-3 font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:bg-gray-50" onclick="toggleFaq(2)">
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <button class="w-full text-left px-4 py-3 font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700" onclick="toggleFaq(2)">
                                 <div class="flex justify-between items-center">
                                     <span>Bagaimana cara menjual produk di AMPUH?</span>
                                     <svg class="w-5 h-5 transform transition-transform" id="icon-2">
@@ -48,7 +48,7 @@
                                     </svg>
                                 </div>
                             </button>
-                            <div class="hidden px-4 pb-3 text-gray-600" id="faq-2">
+                            <div class="hidden px-4 pb-3 text-gray-600 dark:text-gray-300" id="faq-2">
                                 <p>1. Daftar sebagai seller/penjual</p>
                                 <p>2. Upload produk dengan foto dan deskripsi lengkap</p>
                                 <p>3. Atur harga dan stok</p>
@@ -57,8 +57,8 @@
                             </div>
                         </div>
 
-                        <div class="border border-gray-200 rounded-lg">
-                            <button class="w-full text-left px-4 py-3 font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:bg-gray-50" onclick="toggleFaq(3)">
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <button class="w-full text-left px-4 py-3 font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700" onclick="toggleFaq(3)">
                                 <div class="flex justify-between items-center">
                                     <span>Apa itu transparansi blockchain di AMPUH?</span>
                                     <svg class="w-5 h-5 transform transition-transform" id="icon-3">
@@ -66,7 +66,7 @@
                                     </svg>
                                 </div>
                             </button>
-                            <div class="hidden px-4 pb-3 text-gray-600" id="faq-3">
+                            <div class="hidden px-4 pb-3 text-gray-600 dark:text-gray-300" id="faq-3">
                                 <p>Setiap transaksi di AMPUH dicatat secara permanen di blockchain EQBR. Ini memastikan:</p>
                                 <p>• Transparansi penuh semua transaksi</p>
                                 <p>• Data tidak dapat dimanipulasi</p>
@@ -75,8 +75,8 @@
                             </div>
                         </div>
 
-                        <div class="border border-gray-200 rounded-lg">
-                            <button class="w-full text-left px-4 py-3 font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:bg-gray-50" onclick="toggleFaq(4)">
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <button class="w-full text-left px-4 py-3 font-medium text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700" onclick="toggleFaq(4)">
                                 <div class="flex justify-between items-center">
                                     <span>Metode pembayaran apa saja yang tersedia?</span>
                                     <svg class="w-5 h-5 transform transition-transform" id="icon-4">
@@ -84,7 +84,7 @@
                                     </svg>
                                 </div>
                             </button>
-                            <div class="hidden px-4 pb-3 text-gray-600" id="faq-4">
+                            <div class="hidden px-4 pb-3 text-gray-600 dark:text-gray-300" id="faq-4">
                                 <p>AMPUH menggunakan Midtrans sebagai payment gateway dengan opsi:</p>
                                 <p>• Transfer bank (BCA, BNI, BRI, Mandiri)</p>
                                 <p>• E-wallet (GoPay, OVO, DANA, ShopeePay)</p>
@@ -96,54 +96,55 @@
                 </div>
 
                 <!-- Contact Form -->
-                <div class="bg-gray-50 rounded-lg p-6">
-                    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Masih Butuh Bantuan?</h2>
-                    <p class="text-gray-600 mb-6">Kirim pesan kepada kami dan tim support akan merespon dengan cepat!</p>
+                <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Masih Butuh Bantuan?</h2>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">Kirim pesan kepada kami dan tim support akan merespon dengan cepat!</p>
 
                     <form action="{{ route('help.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                         @csrf
                         
                         <div>
-                            <label for="gmail" class="block text-sm font-medium text-gray-700 mb-1">Email Anda</label>
+                            <label for="gmail" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email Anda</label>
                             <input type="email" 
                                    name="gmail" 
                                    id="gmail" 
                                    value="{{ old('gmail', Auth::guard('web')->user()->email ?? Auth::guard('seller')->user()->email ?? '') }}"
                                    required 
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                   placeholder="contoh: abc@gmail.com"
+                                   class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">
                             @error('gmail')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="pesan" class="block text-sm font-medium text-gray-700 mb-1">Pesan Anda</label>
+                            <label for="pesan" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Pesan Anda</label>
                             <textarea name="pesan" 
                                       id="pesan" 
                                       rows="5" 
                                       required 
                                       placeholder="Jelaskan masalah atau pertanyaan Anda dengan detail..."
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ old('pesan') }}</textarea>
+                                      class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent">{{ old('pesan') }}</textarea>
                             @error('pesan')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div>
-                            <label for="upload_file" class="block text-sm font-medium text-gray-700 mb-1">Upload File (Opsional)</label>
-                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-blue-400 transition-colors">
+                            <label for="upload_file" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Upload File (Opsional)</label>
+                            <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 dark:border-gray-600 border-dashed rounded-md hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
                                 <div class="space-y-1 text-center">
-                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                    <svg class="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" stroke="currentColor" fill="none" viewBox="0 0 48 48">
                                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
-                                    <div class="flex text-sm text-gray-600">
-                                        <label for="upload_file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                    <div class="flex text-sm text-gray-600 dark:text-gray-400">
+                                        <label for="upload_file" class="relative cursor-pointer bg-white dark:bg-gray-700 rounded-md font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
                                             <span>Upload foto atau video</span>
                                             <input id="upload_file" name="upload_file" type="file" class="sr-only" accept="image/*,video/*" onchange="validateFileSize(this)">
                                         </label>
                                         <p class="pl-1">atau drag and drop</p>
                                     </div>
-                                    <p class="text-xs text-gray-500">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
                                         PNG, JPG, GIF hingga 10MB<br>
                                         MP4, MOV, AVI, WMV hingga 10MB
                                     </p>
