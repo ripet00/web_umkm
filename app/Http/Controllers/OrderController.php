@@ -119,6 +119,12 @@ class OrderController extends Controller
                     'email' => $user->email,
                     'phone' => $user->no_hp,
                 ],
+                // URL Configuration untuk Midtrans
+                'callbacks' => [
+                    'finish' => route('orders.show', $mainOrder) . '?status=success',
+                    'error' => route('orders.show', $mainOrder) . '?status=error',
+                    'unfinish' => route('orders.show', $mainOrder) . '?status=pending',
+                ],
                 // Informasi seller untuk tracking
                 'custom_field1' => $seller->merchant_id,
                 'custom_field2' => 'seller_payment_' . $seller->id,
@@ -137,29 +143,51 @@ class OrderController extends Controller
         }
     }
 
-    public function handleMidtransNotification(Request $request)
+    public function callback(Request $request)
     {
+        // Log untuk debugging
+        Log::info('Midtrans notification received', [
+            'payload' => $request->all(),
+            'headers' => $request->headers->all()
+        ]);
+
         $notification_payload = $request->all();
         $orderId = $notification_payload['order_id'];
         $statusCode = $notification_payload['status_code'];
-        $grossAmount = $notification_payload['gross_amount'];
+        $grossAmount = 
+        $notification_payload['gross_amount'];
         $signatureKey = $notification_payload['signature_key'];
-        $serverKey = config('midtrans.server_key');
+
+        // Ambil order untuk mendapatkan seller-specific server key
+        $order = Order::where('order_number', $orderId)->first();
+
+        if (!$order) {
+            Log::error('Order not found for notification', ['order_id' => $orderId]);
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Gunakan server key dari seller yang sesuai
+        $serverKey = $order->seller->server_key;
 
         $signature = hash('sha512', $orderId . $statusCode . $grossAmount . $serverKey);
 
         if ($signature !== $signatureKey) {
+            Log::error('Invalid signature for notification', [
+                'order_id' => $orderId,
+                'expected' => $signature,
+                'received' => $signatureKey
+            ]);
             return response()->json(['message' => 'Invalid signature'], 403);
-        }
-
-        $order = Order::where('order_number', $orderId)->first();
-
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
         }
 
         $transactionStatus = $notification_payload['transaction_status'];
         $fraudStatus = $notification_payload['fraud_status'];
+
+        Log::info('Processing transaction status', [
+            'order_id' => $orderId,
+            'transaction_status' => $transactionStatus,
+            'fraud_status' => $fraudStatus
+        ]);
 
         if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
             if ($fraudStatus == 'accept') {
@@ -169,7 +197,7 @@ class OrderController extends Controller
             $order->update(['payment_status' => 'failed']);
         }
 
-        return response()->json(['message' => 'Notification processed']);
+        return response()->json(['message' => 'Notification processed successfully']);
     }
 
     protected function processSuccessfulPayment(Order $order)
