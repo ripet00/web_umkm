@@ -49,13 +49,19 @@ class OrderController extends Controller
             return redirect()->route('cart.index')->with('error', 'Tidak ada item di keranjang untuk di-checkout.');
         }
         
-        // Cek apakah semua seller sudah aktif
+        // Cek apakah semua seller bisa menerima pembayaran
         $itemsBySeller = $cart->items->groupBy('product.seller_id');
         foreach ($itemsBySeller as $sellerId => $items) {
             $seller = $items->first()->product->seller;
-            if (!$seller->isActivated()) {
+            if (!$seller->canReceivePayments()) {
+                $missingConfig = [];
+                if (empty($seller->merchant_id)) $missingConfig[] = 'Merchant ID';
+                if (empty($seller->client_key)) $missingConfig[] = 'Client Key';
+                if (empty($seller->server_key)) $missingConfig[] = 'Server Key';
+                
+                $configList = implode(', ', $missingConfig);
                 return redirect()->route('cart.index')
-                    ->with('error', 'Seller "' . $seller->nama_koperasi . '" belum mengaktifkan akun Midtrans. Silakan hubungi seller untuk aktivasi.');
+                    ->with('error', 'Seller "' . $seller->nama_koperasi . '" belum melengkapi konfigurasi Midtrans (' . $configList . '). Silakan hubungi seller untuk aktivasi pembayaran.');
             }
         }
 
