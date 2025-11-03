@@ -166,9 +166,6 @@ if (Auth::guard('web')->check()) {
                 <x-responsive-nav-link :href="route('login')">
                     {{ __('Log In') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('user.register')">
-                    {{ __('Register') }}
-                </x-responsive-nav-link>
             </div>
         @endauth
     </div>

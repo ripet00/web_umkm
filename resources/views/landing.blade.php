@@ -120,8 +120,8 @@
                         <a href="{{ route('products.show', $product) }}" class="block group">
                             <div class="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 bg-white dark:bg-gray-800">
                                 <div class="aspect-w-1 aspect-h-1 w-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
-                                    @if($product->gambar_produk)
-                                        <img src="{{ asset('storage/' . $product->gambar_produk) }}" alt="{{ $product->nama_produk }}" class="w-full h-full object-center object-cover group-hover:opacity-75">
+                                    @if($product->primaryImage)
+                                        <img src="{{ asset('storage/' . $product->primaryImage->image_path) }}" alt="{{ $product->nama_produk }}" class="w-full h-full object-center object-cover group-hover:opacity-75">
                                     @else
                                         <div class="flex items-center justify-center h-48">
                                             <span class="text-gray-500 text-sm">Gambar tidak tersedia</span>
